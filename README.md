@@ -1,4 +1,31 @@
+# UserRecon Reborn
+
+### Status: in development/not yet functional
+
+This is a re-write of TheLinuxChoice's UserRecon, which is (mostly) broken. This re-write has some extra features, and will (hopefully) be more easy to maintain and add onto.
+
+### To-do:
+
+-  [x] Colors/coloring
+
+-  [x] Launch arguments
+   -  [x] Silent mode
+   -  [x] Username as a launch argument
+      -  [x] Set output file creation
+   -  [x] Set output file creation (on no username entered)
+-  [ ] Scan function
+   -  [ ] Creation and documentation of the arguments
+-  [ ] Print function
+-  [ ] Addition/migration of all (original) site/username checks
+
+
+
+Original README:
+
+----------------
+
 # UserRecon v1.0
+
 # Author: @thelinuxchoice
 # https://github.com/thelinuxchoice/userrecon
 
@@ -6,13 +33,3 @@ Find usernames across over 75 social networks
 This is useful if you are running an investigation to determine the usage of the same username on different social networks.
 
 ![userrecon](./userrecon.png)
-
-## TODO:
-
-- [ ] Make prototype for new script
-   - [ ] Make it use functions (if that'll work?)
-      - [ ] Maybe a couple of different functions (one for each url scheme)?
-   - [ ] Add or migrate all current checks to new script
-   - [ ] Add the url name to the created document
-   - [ ] Possibly add in controlled variations?
-   - [ ] Differenciate from page down/check broken, user not found, and user found

@@ -14,6 +14,7 @@ exitRST()
 	then
 		printf "${RST}"
 	fi
+	printf ""
 	exit
 }
 trap "exitRST" EXIT 
