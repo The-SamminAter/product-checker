@@ -7,6 +7,7 @@ GRN="\e[1;92m" #1;32 or 1;92
 BLU="\e[1;96m" #What's supposed to be blue looks purple so cyan (1;36 or 1;96) is used
 YLW="\e[1;93m" #1;33 or 1;93
 
+
 #If the user or the script exits (while not being ran in silent mode), this clears the colors
 exitRST()
 {
@@ -18,6 +19,7 @@ exitRST()
 	exit
 }
 trap "exitRST" EXIT 
+
 
 #Checks if $1 is an argument or not, mainly for use in the elif in name and argument handling
 if [ $(printf '%s' "$1" | cut -c1) == "-" ]
@@ -31,6 +33,7 @@ then
 else
 	isArg=false
 fi
+
 
 #Name and argument handling
 name=""
@@ -87,10 +90,11 @@ else
 	done
 fi
 
+
 #File handling
-if [ ${fCreate} ] #If the variable exists
+if [ ${fCreate} ] #If fCreate exists, meaning it's already been set
 then
-	printf ""
+	: #This just does nothing
 else
 	fCreate=false
 	fCreateRaw=""
@@ -110,8 +114,9 @@ then
 		let "fCount++"
 		fName="${name}-${fCount}.txt"
 	done
-	#touch "${fName}"
+	touch "${fName}"
 fi
+
 
 #scan() scans URLs based on info passed to them, and outputs the results
 #This was made with the assumption that if a name/page doesn't exist, it (the username) won't be mentioned anywhere in the curl'd text
@@ -119,28 +124,29 @@ fi
 scan()
 {
 	#Thought of/planned inputs
-	#$1: URL
-	#$2: Name (of site)
+	#$1: Name (of site)
+	#$2: URL
 	#$3: success text/message
-	#$4: failure text/message
-	#$5: additional error text/message
+	#$4: failure text/message (if necessary) (not yet written)
+	#$5: additional error text/message (if necessary) (not yet written)
 	status="If you see this, something is wrong"
-	rawResult=$(curl -s "$2")
-	cleanedResult=$(grep "${username}" << "${rawResult}")
-	echo "${cleanedResult}"
-	if [ "${cleanedRresult}" != "" ] #Pretty much, if the result isn't nothing, we presume that it exists
+	if [ "$4" ] || [ "$5" ]
 	then
-		#printf="${BLU}[${GRN}✓${BLU}] ${GRN}Success: ${BLU}$1 ${GRN}found\n"
-		status="success"
-	elif [ "${cleanedResult}" == "" ]
-	then
-		#printf="${BLU}[${RED}X${BLU}] ${RED}Failure: ${BLU}$1 ${RED}not found\n"
-		status="failure: scan()"
+		echo "stub: scan(): if arg4 or arg5 exist"
+	else
+		result=$(curl -s -A "UserRecon Reborn/0.0" "$2" | grep "$3") #Custom user agent
+		#if [ "${result}" != "" ] #Pretty much, if the result isn't nothing, we presume that it exists
+		if [ -n "${result}" ]
+		then
+			status="success $1"
+		else
+			status="failure $1"
+		fi
 	fi
-	echo "${status}"
-	print 
+	print "${status}"
 	unset status #Unsets the variable, so it doesn't exist until scan() gets called again
 }
+
 
 #print() prints and writes (to fName) information passed to it by scan()
 print()
@@ -148,5 +154,10 @@ print()
 	echo "stub: print()"
 }
 
+
+#URL checking:
+
 #Reddit
-#scan "https://api.reddit.com/users/${username}" "Reddit"
+#Rejects the user agent curl/*
+#cmd Name     URL                                                                                   
+scan "Reddit" "https://api.reddit.com/user/${name}" "${name}"
