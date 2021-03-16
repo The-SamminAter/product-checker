@@ -6,17 +6,17 @@ This is a re-write of TheLinuxChoice's UserRecon, which is (mostly) broken. This
 
 ### To-do:
 
--  [x] Colors/coloring
+- [x] Colors/coloring
+- [x] Launch arguments
+   - [x] Silent mode
+   - [x] Username as a launch argument
+      - [x] Set output file creation
+   - [x] Set output file creation (on no username entered)
+- [ ] Scan function
+   - [ ] Creation and documentation of the arguments
+- [ ] Print function
+- [ ] Addition/migration of all (original) site/username checks
 
--  [x] Launch arguments
-   -  [x] Silent mode
-   -  [x] Username as a launch argument
-      -  [x] Set output file creation
-   -  [x] Set output file creation (on no username entered)
--  [ ] Scan function
-   -  [ ] Creation and documentation of the arguments
--  [ ] Print function
--  [ ] Addition/migration of all (original) site/username checks
 
 ----------------
 
