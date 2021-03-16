@@ -4,6 +4,8 @@
 
 This is a re-write of TheLinuxChoice's UserRecon, which is (mostly) broken. This re-write has some extra features, and will (hopefully) be more easy to maintain and add onto.
 
+I suggest using this on on a shell with a black background (for visibility)
+
 ### To-do:
 
 - [x] Colors/coloring
