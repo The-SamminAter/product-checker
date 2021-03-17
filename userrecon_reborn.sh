@@ -21,10 +21,10 @@ exitRST()
 trap "exitRST" EXIT 
 
 
-#Checks if $1 is an argument or not, mainly for use in the elif in name and argument handling
+#This just checks if $1 is a known argument
 if [[ $(printf '%s' "$1" | cut -c1) == "-" ]]
 then
-	if [ "$1" == "-s" ] || [ "$1" == "--silent" ] || [ "$1" == "-y" ] || [ "$1" == "--yes" ] || [ "$1" == "-n" ] || [ "$1" == "--no" ]
+	if [[ "$1" == "-h" || "--help" || "-s" || "--silent" || "-y" || "--yes" || "-n" || "--no" ]]
 	then
 		isArg=true
 	else
@@ -38,7 +38,23 @@ fi
 #Name and argument handling
 name=""
 silent=false
-if [[ "${isArg}" == true && "$1" == "-s" ]] || [[ "${isArg}" == true && "$1" == "--silent" ]] #Silent mode
+if [[ "${isArg}" == true && "$1" == "-h" ]] || [[ "${isArg}" == true && "$1" == "--help" ]] #Help dialogue
+then
+	echo "UserRecon Reborn v0.9 - help dialogue:"
+	echo "Usage: ./userrecon_reborn.sh [argument] <name>"
+	echo ""
+	echo "Arguments:"
+	echo " -h, --help    Displays this help dialogue"
+	echo " -s, --silent  Enables silent mode, which silently saves output a local file"
+	echo " -y, --yes     Enables writing the output to a local file"
+	echo " -n, --no      Disables writing the output to a local file"
+	echo ""
+	echo "Local file naming:"
+	echo " If enabled, a file named name-x.txt in the current directory will be created and written to, where 'name' is the name scanned for, and 'x' is a number, 1 or higher, to prevent overwriting of previous scans"
+	echo ""
+	echo "Homepage: <https://github.com/the-samminater/userrecon_reborn>"
+	exit
+elif [[ "${isArg}" == true && "$1" == "-s" ]] || [[ "${isArg}" == true && "$1" == "--silent" ]] #Silent mode
 then
 	silent=true
 	if [ $2 ]
@@ -47,13 +63,21 @@ then
 		fCreate=true
 	else
 		#I figure that if this is being ran in silent mode, then it doesn't need color
-		printf "[!] Error: while using silent mode, arg 2 can't be empty\n" #I can't have this printed to the file, because it hasn't been made yet
+		echo "[!] Error: while using silent mode, <arg2> can't be empty" #I can't have this printed to the file, because it (the file) hasn't been made yet
 		exit
 	fi
-elif [ $1 ] && [ "${isArg}" == false ] #For if the script was launched with a name as an argument; doesn't currently work
+elif [ "${isArg}" == true ] && [ $2 ] #For if the script was launched with an fCreate argument as arg1, and the name as arg2
 then
-	#Setting the background turned out to be iffy, so I'm just not doing it
-	#printf "\e[40m" #Set a black background
+	name="$2"
+	if [ "$1" == "-y" ] || [ "$1" == "--yes" ]
+	then
+		fCreate=true
+	elif [ "$1" == "-n" ] || [ "$1" == "--no" ]
+	then
+		fCreate=false
+	fi
+elif [ $1 ] && [ "${isArg}" == false ] #For if the script was launched with a name as an argument; an alternative to the elif above this one
+then
 	name="$1"
 	if [ "$2" == "-y" ] || [ "$2" == "--yes" ]
 	then
@@ -63,8 +87,6 @@ then
 		fCreate=false
 	fi
 else
-	#Setting the background turned out to be iffy, so I'm just not doing it
-	#printf "\e[40m" #Set a black background
 	if [ "$1" == "-y" ] || [ "$1" == "--yes" ]
 	then
 		fCreate=true
@@ -85,7 +107,7 @@ else
 	printf "                                                    '.__.'	\n"
 	while [ "${name}" == "" ]
 	do
-		printf "${BLU}[?] Username: "
+		printf "${BLU}[?] Name: "
 		read -p "" name
 		#Add similar name(s) option
 	done
@@ -127,26 +149,29 @@ then
 fi
 
 
-#scan() scans URLs based on info passed to them, and outputs the results
-#This was made with the assumption that if a name/page doesn't exist, it (the username) won't be mentioned anywhere in the curl'd text
-#Also, the output (from scan()) is to be colored
+#scan() scans URLs based on info passed to it, determines if the profile exists or not, and then passes that on to print()
 scan()
 {
-	#Thought of/planned inputs
 	#$1: name (of site)
 	#$2: URL
 	#$3: string to grep for (as an indication of success)
-	#$4: any set var turns $3 into an indication of failure - only use if necessary
+	#$4: if set to -i (as in inverse), turns $3 into an indication of failure - only use if necessary
+	#$5: Headers (if necessary)
 	#
 	#Credit to https://stackoverflow.com/a/57120937 for 2>&1 for capturing curl's error
 	#Also in use is a custom user agent, as curl/* doesn't work for some sites
-	resultRaw=$(curl -s -S --show-error -A "UserRecon Reborn/0.0" "$2" 2>&1)
-	if [[ $(echo "${resultRaw}" | head -c 5) == "curl:" ]]
+	if [ "$5" ] #In the case that a header is necessary
+	then
+		resultRaw=$(curl -s -S --show-error -A "UserRecon Reborn/0.9" "$2" -H "$5" 2>&1)
+	else
+		resultRaw=$(curl -s -S --show-error -A "UserRecon Reborn/0.9" "$2" 2>&1)
+	fi
+	if [[ $(echo "${resultRaw}" | head -c 5) == "curl:" ]] #Need to change to deal with errors w/ more than one line
 	then
 		print "error" "${resultRaw}"
 	else
 		result=$(echo "${resultRaw}" | grep "$3")
-		if [ $4 ]
+		if [ "$4" == "-i" ]
 		then
 			if [ -n "${result}" ]
 			then
@@ -173,7 +198,7 @@ print()
 {
 	#$1: status message
 	#$2: site name/error message (if $1 is "error")
-	
+	#
 	#Printing out the results (to the console) if the script isn't being ran in silent mode
 	if [ "${silent}" == false ]
 	then
@@ -206,7 +231,9 @@ print()
 
 
 #URL checking:
-#Arguments are explained
+#Arguments are explained in scan()
 
+#Imgur
+scan "Imgur" "https://api.imgur.com/3/account/${name}" "${name}" "" "Authorization: Client-ID f7b3d452da6f049" #Imgur Client-ID for UserRecon Reborn
 #Reddit                                                                                   
 scan "Reddit" "https://api.reddit.com/user/${name}" "${name}"
