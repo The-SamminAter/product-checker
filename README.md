@@ -14,9 +14,9 @@ I suggest using this on on a shell with a black background (for visibility)
    - [x] Username as a launch argument
       - [x] Set output file creation
    - [x] Set output file creation (on no username entered)
-- [ ] Scan function
-   - [ ] Creation and documentation of the arguments
-- [ ] Print function
+- [x] Scan function
+   - [x] Creation and documentation of the arguments
+- [x] Print function
 - [ ] Addition/migration of all (original) site/username checks
 
 
