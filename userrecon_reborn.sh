@@ -81,7 +81,7 @@ else
 	printf "${GRN} | | | / __|/ _ \ '__| |_) / _ \/ __/ _ \| '_ \ ${RED}|\__\    /__/|	\n"
 	printf "${GRN} | |_| \__ \  __/ |  |  _ <  __/ (_| (_) | | | |${RED} \    ||    /	\n"
 	printf "${GRN}  \___/|___/\___|_|  |_| \_\___|\___\___/|_| |_|${RED}  \        / 	\n"
-	printf "${BLU} Reborn ${RED}----------------------------------- ${BLU}v0.0${RED}   \  __  /	\n"
+	printf "${BLU} Reborn ${RED}----------------------------------- ${BLU}v0.9${RED}   \  __  /	\n"
 	printf "                                                    '.__.'	\n"
 	while [ "${name}" == "" ]
 	do
@@ -135,27 +135,36 @@ scan()
 	#Thought of/planned inputs
 	#$1: name (of site)
 	#$2: URL
-	#$3: success text/message
-	#$4: failure text/message (if necessary) (not yet written)
-	#$5: additional error text/message (if necessary) (not yet written)
+	#$3: string to grep for (as an indication of success)
+	#$4: any set var turns $3 into an indication of failure - only use if necessary
 	#
-	#This should be re-organized to curl before the if statement, and then the arguments/their existence dictates what happens
-	#That way, errors will be recognized and retained, instead of the status just being "failure"
-	#
-	if [ "$4" ] || [ "$5" ]
+	#Credit to https://stackoverflow.com/a/57120937 for 2>&1 for capturing curl's error
+	#Also in use is a custom user agent, as curl/* doesn't work for some sites
+	resultRaw=$(curl -s -S --show-error -A "UserRecon Reborn/0.0" "$2" 2>&1)
+	if [[ $(echo "${resultRaw}" | head -c 5) == "curl:" ]]
 	then
-		echo "stub: scan(): arg4 or arg5 exist"
+		print "error" "${resultRaw}"
 	else
-		result=$(curl -s -A "UserRecon Reborn/0.0" "$2" | grep "$3") #Custom user agent
-		if [ -n "${result}" ] #If $result isn't null, we presume success. For when this isn't the case, use $4 and $5
+		result=$(echo "${resultRaw}" | grep "$3")
+		if [ $4 ]
 		then
-			status="success"
-		else
-			status="failure"
+			if [ -n "${result}" ]
+			then
+				status="failure"
+			else
+				status="success"
+			fi
+		else 
+			if [ -n "${result}" ] 
+			then
+				status="success"
+			else
+				status="failure"
+			fi
 		fi
+		print "${status}" "$1"
+		unset status
 	fi
-	print "${status}" "$1"
-	unset status #Unsets the variable, so it doesn't exist until scan() gets called again
 }
 
 
@@ -164,7 +173,7 @@ print()
 {
 	#$1: status message
 	#$2: site name/error message (if $1 is "error")
-	#
+	
 	#Printing out the results (to the console) if the script isn't being ran in silent mode
 	if [ "${silent}" == false ]
 	then
@@ -197,8 +206,7 @@ print()
 
 
 #URL checking:
+#Arguments are explained
 
-#Reddit
-#Rejects the user agent curl/*
-#cmd Name     URL                                                                                   
+#Reddit                                                                                   
 scan "Reddit" "https://api.reddit.com/user/${name}" "${name}"
