@@ -1,6 +1,6 @@
 # UserRecon Reborn
 
-### Status: in development/not yet functional
+### Status: fully functional, just need to migrate/add most of the checks
 
 This is a re-write of TheLinuxChoice's UserRecon, which is (mostly) broken. This re-write has some extra features, and will (hopefully) be more easy to maintain and add onto.
 
