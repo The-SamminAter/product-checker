@@ -9,13 +9,13 @@ I suggest using this on on a shell with a black background (for visibility)
 ### To-do:
 
 - [x] Colors/coloring
-- [ ] Launch arguments
+- [x] Launch arguments
    - [x] Silent mode
    - [x] Username as a launch argument
       - [x] Set output file creation
-      - [ ] Accept file creation argument first
+      - [x] Accept file creation argument first
    - [x] Set output file creation (on no username entered)
-   - [ ] Help argument
+   - [x] Help argument
 - [x] Scan function
    - [x] Creation and documentation of the arguments
 - [x] Print function
