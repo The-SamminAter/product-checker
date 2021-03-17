@@ -9,15 +9,18 @@ I suggest using this on on a shell with a black background (for visibility)
 ### To-do:
 
 - [x] Colors/coloring
-- [x] Launch arguments
+- [ ] Launch arguments
    - [x] Silent mode
    - [x] Username as a launch argument
       - [x] Set output file creation
+      - [ ] Accept file creation argument first
    - [x] Set output file creation (on no username entered)
+   - [ ] Help argument
 - [x] Scan function
    - [x] Creation and documentation of the arguments
 - [x] Print function
 - [ ] Addition/migration of all (original) site/username checks
+- [ ] Add name variation option/checking
 
 
 ----------------
