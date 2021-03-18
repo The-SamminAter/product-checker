@@ -1,13 +1,14 @@
 #!/bin/bash
 
+#Version
+version="v0.10"
+
 #Coloring:
 RST="\e[0;0m"
 RED="\e[1;91m"
 GRN="\e[1;92m" #1;32 or 1;92
 BLU="\e[1;96m" #What's supposed to be blue looks purple so cyan (1;36 or 1;96) is used
 YLW="\e[1;93m" #1;33 or 1;93
-
-
 #If the user or the script exits (while not being ran in silent mode), this clears the colors
 exitRST()
 {
@@ -24,7 +25,8 @@ trap "exitRST" EXIT
 #This just checks if $1 is a known argument
 if [[ $(printf '%s' "$1" | cut -c1) == "-" ]]
 then
-	if [[ "$1" == "-h" || "--help" || "-s" || "--silent" || "-y" || "--yes" || "-n" || "--no" ]]
+	#There's got to be a simpler and better way to do this, but using [[ "$1" == @("-y"|"--yes") ]] requires bash 4.2 or higher
+	if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "-s" ] || [ "$1" == "--silent" ] || [ "$1" == "-y" ] || [ "$1" == "--yes" ] || [ "$1" == "-n" ] || [ "$1" == "--no" ]
 	then
 		isArg=true
 	else
@@ -40,7 +42,7 @@ name=""
 silent=false
 if [[ "${isArg}" == true && "$1" == "-h" ]] || [[ "${isArg}" == true && "$1" == "--help" ]] #Help dialogue
 then
-	echo "UserRecon Reborn v0.9 - help dialogue:"
+	echo "UserRecon Reborn ${version} - help dialogue:"
 	echo "Usage: ./userrecon_reborn.sh [argument] <name>"
 	echo ""
 	echo "Arguments:"
@@ -66,33 +68,36 @@ then
 		echo "[!] Error: while using silent mode, <arg2> can't be empty" #I can't have this printed to the file, because it (the file) hasn't been made yet
 		exit
 	fi
-elif [ "${isArg}" == true ] && [ $2 ] #For if the script was launched with an fCreate argument as arg1, and the name as arg2
-then
-	name="$2"
-	if [ "$1" == "-y" ] || [ "$1" == "--yes" ]
-	then
-		fCreate=true
-	elif [ "$1" == "-n" ] || [ "$1" == "--no" ]
-	then
-		fCreate=false
-	fi
-elif [ $1 ] && [ "${isArg}" == false ] #For if the script was launched with a name as an argument; an alternative to the elif above this one
-then
-	name="$1"
-	if [ "$2" == "-y" ] || [ "$2" == "--yes" ]
-	then
-		fCreate=true
-	elif [ "$2" == "-n" ] || [ "$2" == "--no" ]
-	then
-		fCreate=false
-	fi
 else
-	if [ "$1" == "-y" ] || [ "$1" == "--yes" ]
+	if [ "$1" ] #If the script is ran with at least one argument
 	then
-		fCreate=true
-	elif [ "$1" == "-n" ] || [ "$1" == "--no" ]
-	then
-		fCreate=false
+		if [ "${isArg}" == true ] #And if the first argument is a recognized argument
+		then
+			if [ "$1" == "-y" ] || [ "$1" == "--yes" ]
+			then
+				fCreate=true
+			elif [ "$1" == "-n" ] || [ "$1" == "--no" ]
+			then
+				fCreate=false
+			fi
+			if [ $2 ] #If there's a second argument, presume it's a name
+			then
+				name="$2"
+			fi
+		else #Presume that the first argument is a name
+			name="$1"
+			if [ $2 ]
+			then
+				#if [[ "$2" == @("-y"|"--yes") ]] #Requires bash v4.2 or later
+				if [ "$2" == "-y" ] || [ "$2" == "--yes" ]
+				then
+					fCreate=true
+				elif [ "$2" == "-n" ] || [ "$2" == "--no" ]
+				then
+					fCreate=false
+				fi
+			fi
+		fi
 	fi
 	#Title; sorry about the general messiness, I've tried to keep it relatively clean
 	#printf "${RED}\n"
@@ -103,14 +108,19 @@ else
 	printf "${GRN} | | | / __|/ _ \ '__| |_) / _ \/ __/ _ \| '_ \ ${RED}|\__\    /__/|	\n"
 	printf "${GRN} | |_| \__ \  __/ |  |  _ <  __/ (_| (_) | | | |${RED} \    ||    /	\n"
 	printf "${GRN}  \___/|___/\___|_|  |_| \_\___|\___\___/|_| |_|${RED}  \        / 	\n"
-	printf "${BLU} Reborn ${RED}----------------------------------- ${BLU}v0.9${RED}   \  __  /	\n"
+	printf "${BLU} Reborn ${RED}---------------------------------- ${BLU}${version}${RED}   \  __  /	\n"
 	printf "                                                    '.__.'	\n"
-	while [ "${name}" == "" ]
-	do
-		printf "${BLU}[?] Name: "
-		read -p "" name
-		#Add similar name(s) option
-	done
+	if [ "${name}" == "" ]
+	then
+		while [ "${name}" == "" ]
+		do
+			printf "${BLU}[?] Name: "
+			read -p "" name
+			#To-do: add similar name(s) option
+		done
+	else
+		printf "${BLU}[?] Name: ${name}\n"
+	fi
 fi
 
 
@@ -142,13 +152,6 @@ then
 fi
 
 
-#This just lets the user know that the script is working, if silent mode isn't enabled
-if [ "${silent}" == false ]
-then
-	printf "${BLU}[*] Checking for ${name}\n"
-fi
-
-
 #scan() scans URLs based on info passed to it, determines if the profile exists or not, and then passes that on to print()
 scan()
 {
@@ -162,9 +165,9 @@ scan()
 	#Also in use is a custom user agent, as curl/* doesn't work for some sites
 	if [ "$5" ] #In the case that a header is necessary
 	then
-		resultRaw=$(curl -s -S --show-error -A "UserRecon Reborn/0.9" "$2" -H "$5" 2>&1)
+		resultRaw=$(curl -s -S --show-error -A "UserRecon Reborn/${version}" "$2" -H "$5" 2>&1)
 	else
-		resultRaw=$(curl -s -S --show-error -A "UserRecon Reborn/0.9" "$2" 2>&1)
+		resultRaw=$(curl -s -S --show-error -A "UserRecon Reborn/${version}" "$2" 2>&1)
 	fi
 	if [[ $(echo "${resultRaw}" | head -c 5) == "curl:" ]] #Need to change to deal with errors w/ more than one line
 	then
