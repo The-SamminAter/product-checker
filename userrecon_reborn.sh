@@ -47,7 +47,7 @@ then
 	echo ""
 	echo "Arguments:"
 	echo " -h, --help    Displays this help dialogue"
-	echo " -s, --silent  Enables silent mode, which silently saves output a local file"
+	echo " -s, --silent  Enables silent mode, which silently writes the output a local file"
 	echo " -y, --yes     Enables writing the output to a local file"
 	echo " -n, --no      Disables writing the output to a local file"
 	echo ""
@@ -240,3 +240,133 @@ print()
 scan "Imgur" "https://api.imgur.com/3/account/${name}" "${name}" "" "Authorization: Client-ID f7b3d452da6f049" #Imgur Client-ID for UserRecon Reborn
 #Reddit                                                                                   
 scan "Reddit" "https://api.reddit.com/user/${name}" "${name}"
+
+
+#Planned sites/site ideas:
+#(Impossible ones will be removed)
+#
+#Instagram
+#Twitter
+#Facebook
+#TikTok
+#GitHub
+#Pintrest
+#YouTube
+#iFunny
+#Tumblr
+#Snapchat
+#Tinder
+#Tinder alternatives
+#VK
+#Torn
+#Roblox
+#PicsArt
+#MySpace
+#Steam
+#Rockstar Games
+#Twitch
+#Vimeo
+#GOG
+#Bethesda
+#Origin
+#PSN
+#PS+ (apparently different than PSN?)
+#Epic Games
+#Fortnite
+#XBox Live
+#Riot Games
+#PornHub
+#Archive.org
+#Medium
+#LinkedIn
+#Warzone
+#League of Legends
+#Activision
+#Amazon
+#Ebay
+#Craigslist
+#AliExpress
+#Apple Music
+#Blizzard
+#GitLab
+#CodePen
+#GameJolt
+#Itch
+#Change.org
+#Fandom (community.fandom.com/wiki/User:${name})
+#Hacker News
+#iFixit
+#Quora
+#OneHack.Us
+#Yahoo (answers)
+#OnlyFans
+#PayPal (public transfer pages?)
+#Pastebin
+#Pastebin alternatives
+#Wikipedia
+#Wikipedia alternatives (brittanica, etc?)
+#Tapas.io
+#Webtoon
+#Radicle
+#Shaw (forums maybe?)
+#Ubisoft
+#VirusTotal
+#YouRepo
+#GoFundMe
+#GoFundMe alternatives
+#
+#Flickr
+#SoundCloud
+#Spotify
+#Disqus
+#DeviantArt
+#About.me
+#FlipBoard
+#SlideShare
+#Fotolog
+#MixCloud
+#Scribd
+#Badoo
+#Patreon
+#BitBucket
+#DailyMotion
+#Etsy
+#CashMe
+#Behance
+#GoodReads
+#Instructables
+#KeyBase
+#Kongregate
+#Livejournal
+#AngelList
+#Last.fm
+#Dribble
+#Codeacademy
+#Gravatar
+#Foursquare
+#Gumroad
+#Newgrounds
+#Wattpad
+#Canva
+#CreativeMarket
+#Trakt
+#500px
+#Buzzfeed
+#TripAdvisor
+#HubPages
+#Contently
+#Houzz
+#blip.fm
+#CodeMentor
+#ReverbNation
+#Designspiration 65
+#Bandcamp
+#ColourLovers
+#IFTTT
+#Slack
+#OkCupid
+#Trip
+#Ello
+#Tracky
+#Tripit
+#Basecamp
