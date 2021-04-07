@@ -236,33 +236,45 @@ print()
 #URL checking:
 #Arguments are explained in scan()
 
+#GitHub
+scan "GitHub" "https://api.github.com/users/${name}" "${name}" "" "Accept: application/vnd.github.v3+json"
+#iFunny
+scan "iFunny" "https://ifunny.co/user/${name}" "${name}"
 #Imgur
 scan "Imgur" "https://api.imgur.com/3/account/${name}" "${name}" "" "Authorization: Client-ID f7b3d452da6f049" #Imgur Client-ID for UserRecon Reborn
+#PicsArt - not using api - couldn't find endpoints (api.picsart.com)
+scan "PicsArt" "https://picsart.com/u/${name}" "${name}"
 #Reddit                                                                                   
 scan "Reddit" "https://api.reddit.com/user/${name}" "${name}"
+#Roblox - not using api
+scan "Roblox" "https://www.roblox.com/users/profile?username=${name}" "code=404" "-i"
+#Tumblr - not using api
+scan "Tumblr" "https://${name}.tumblr.com/" "${name}"
+#YouTube - not using api
+scan "YouTube" "https://www.youtube.com/user/${name}" "${name}"
 
 
 #Planned sites/site ideas:
 #(Impossible ones will be removed)
 #
-#Instagram
-#Twitter
-#Facebook
-#TikTok
-#GitHub
-#Pintrest
-#YouTube
-#iFunny
-#Tumblr
+#Instagram - requires api access or headless browser
+#Twitter - requires api access or headless browser
+#	Useful strings are in https://abs.twimg.com/responsive-web/client-web/i18n/en.324d25d5.js
+#	Maybe refer headers are neccesary?
+#	An example: curl 'https://abs.twimg.com/responsive-web/client-web/i18n/en.324d25d5.js' -H 'User-Agent: UserRecon Reborn/${version}' -H 'Accept: */*' -H 'Accept-Language: en-US,en;q=0.5' --compressed -H 'Referer: https://mobile.twitter.com/${name}' -H 'Origin: https://mobile.twitter.com' -H 'DNT: 1' -H 'Sec-GPC: 1' -H 'Connection: keep-alive' 
+#	Maybe try finding '<span class="css-901oao css-16my406 r-poiln3 r-bcqeeo r-qvutc0">*</span>' and where/when that's loaded in
+#	^^That contains both 'This account doesn’t exist', and 'Try searching for another.'
+#	Would be a pain, as that file contains all of the strings; maybe try to curl a profile image url instead, or perhaps search for the 'Joined: ' string
+#	Maybe try using a username to id converter? If it's reliable, then I can use that to check for existence
+#Facebook - curl refuses to connect?
+#TikTok - need to look into
+#Pintrest - requires api access or headless browser
 #Snapchat
 #Tinder
 #Tinder alternatives
-#VK
-#Torn
-#Roblox
-#PicsArt
-#MySpace
-#Steam
+#VK - either requires api access, a headless browser, or converting a user's name to their id
+#Torn - likely not possible (unless the user supplies their personal api key)
+#Steam - need to look into, get api access, or a headless browser
 #Rockstar Games
 #Twitch
 #Vimeo
