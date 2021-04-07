@@ -21,6 +21,7 @@ I suggest using this on on a shell with a black background (for visibility)
 - [x] Print function
 - [ ] Addition/migration of all (original) site/username checks
 - [ ] Add name variation option/checking
+- [ ] Add terminal size checking (`tput cols`)
 
 
 ----------------
