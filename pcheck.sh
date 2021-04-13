@@ -76,6 +76,7 @@ print()
 	#$3: URL to open when the notification is pressed
 	if [ "$1" == "success" ]
 	then
+		tput bel
 		printf "${BLU}[${GRN}\xE2\x9C\x94${BLU}] ${GRN}$2 is in stock\n"
 		shouldOpenURL=$(osascript -e 'tell app "System Events" to display dialog "'"$2 is in stock! Click OK to view it."'" with title "Product check"' 2>&1)
 		if [ "${shouldOpenURL}" == "button returned:OK" ]
