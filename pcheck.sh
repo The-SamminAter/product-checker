@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #A script made for a friend of mine, to check if any of the graphics cards he's looking to buy are finally in stock
 #Most of this code is originally from userrecon_reborn
 
@@ -25,7 +25,6 @@ then
 else
 	delay="300"
 fi
-
 
 #scan() scans URLs based on info passed to it, determines if the profile exists or not, and then passes that on to print()
 scan()
@@ -72,16 +71,21 @@ scan()
 print()
 {
 	#$1: status message
-	#$2: site name/error message (if $1 is "notice")
-	#$3: URL to open when the notification is pressed
+	#$2: product name or notice message (if $1 is "notice")
+	#$3: URL to open (if chosen)
 	if [ "$1" == "success" ]
 	then
-		tput bel
-		printf "${BLU}[${GRN}\xE2\x9C\x94${BLU}] ${GRN}$2 is in stock\n"
-		shouldOpenURL=$(osascript -e 'tell app "System Events" to display dialog "'"$2 is in stock! Click OK to view it."'" with title "Product check"' 2>&1)
-		if [ "${shouldOpenURL}" == "button returned:OK" ]
+		tput bel #I believe this works on all OSes
+		if [ "$(uname)" == "Darwin" ] #This is done presuming that we have automation permission (if necessary)
 		then
-			open "$3" #This opens the product's URL in the user's default browser, if they hit the 'OK' button
+			printf "${BLU}[${GRN}\xE2\x9C\x94${BLU}] ${GRN}$2 is in stock\n"
+			shouldOpenURL=$(osascript -e 'tell app "System Events" to display dialog "'"$2 is in stock! Click OK to view it."'" with title "Product check"' 2>&1)
+			if [ "${shouldOpenURL}" == "button returned:OK" ]
+			then
+				open "$3" #This opens the product's URL in the user's default browser, if they hit the 'OK' button
+			fi #Presume that the OS is linux
+		else
+			echo "stub"
 		fi
 	elif [ "$1" == "failure" ]
 	then
@@ -93,33 +97,47 @@ print()
 }
 
 
+#Automation permission checking (required for Mojave/10.14 and up)
+if [ "$(uname)" == "Darwin" ]
+then
+	case $(sw_vers -productVersion) in
+		10.14*|10.15*|10.16*|11*|10.17*|12*)
+			#Error message from when we don't have perms (from some 10.15.x):
+			#28:42: execution error: Not authorized to send Apple events to System Events. (-1743)
+			#Error message from when we do have perms (from 10.12.6):
+			#28:42: execution error: System Events got an error: Can’t make application "System Events" into type string. (-1700)
+			print "notice" "Automation permission requested for Terminal"
+			automationTest=$(osascript -e 'tell app "System Events" to display dialog' 2>&1 | awk {'print $NF'})
+			if [ "${automationTest}" == "(-1743)" ]
+			then
+				echo "we no good: ${automationTest}"
+				print "notice" "Automation permission is required to show alerts"
+				print "notice" "Please grant Terminal the permissions in 'System Preferences'->'Security & Privacy'->'Privacy'->'Automation'"
+			elif [ "${automationTest}" == "(-1700)" ]
+			then
+				echo "we good: ${automationTest}"
+			else
+				echo "unknown error message: ${automationTest}"
+			fi
+			
+			#Getting the focused window so we can return to it immediately (need to check if it requires perms):
+			lastWindow=$(osascript -e 'tell application "System Events" to get name of application processes whose frontmost is true and visible is true')
+			echo "lastWindow: ${lastWindow}"
+			osascript -e "tell application \"${lastWindow}\" to activate"
+			
+			;;
+		*)
+			;;
+	esac
+fi
+#TODO: add linux alert support
+
+
 #URL checking:
 #Arguments are explained in scan()
-infiniteLoop=true
-while [ ${infiniteLoop} == true ]
-do
+while [ true ]
+do	
 	print "notice" "check started"
-	scan "ASUS DUAL GeForce RTX 3060 OC Edition" "https://www.canadacomputers.com/product_info.php?cPath=43_557_559&item_id=190839" 'itemprop="availability" content="InStock"'
-	scan "ASUS DUAL GeForce RTX 3060 Ti OC Edition" "https://www.canadacomputers.com/product_info.php?cPath=43_557_559&item_id=184760" 'itemprop="availability" content="InStock"'
-	scan "ASUS DUAL GeForce RTX 3060 Ti OC Edition" "https://www.memoryexpress.com/Products/MX00114818" "<header>Availability:" "-li" "2" "Out of Stock"
-	scan "ASUS DUAL GeForce RTX 3070" "https://www.newegg.ca/asus-geforce-rtx-3070-dual-rtx3070-8g/p/N82E16814126460" '"Instock":true'
-	scan "ASUS DUAL GeForce RTX 3070 OC Edition" "https://www.memoryexpress.com/Products/MX00114566" "<header>Availability:" "-li" "2" "Out of Stock"
-	scan "ASUS KO GeForce RTX 3060 Ti OC Edition" "https://www.memoryexpress.com/Products/MX00114888" "<header>Availability:" "-li" "2" "Out of Stock"
-	scan "ASUS KO GeForce RTX 3070 OC Edition" "https://www.memoryexpress.com/Products/MX00114785" "<header>Availability:" "-li" "2" "Out of Stock"
-	scan "EVGA GeForce RTX 3060 XC" "https://www.newegg.ca/evga-geforce-rtx-3060-12g-p5-3655-kr/p/N82E16814487538" '"Instock":true'
-	scan "EVGA GeForce RTX 3060 XC" "https://www.newegg.ca/evga-geforce-rtx-3060-12g-p5-3657-kr/p/N82E16814487539" '"Instock":true'
-	scan "EVGA GeForce RTX 3060 XC" "https://www.memoryexpress.com/Products/MX00116013" "<header>Availability:" "-li" "2" "Out of Stock"
-	scan "EVGA GeForce RTX 3060 Ti XC" "https://www.memoryexpress.com/Products/MX00115014" "<header>Availability:" "-li" "2" "Out of Stock"
-	scan "GIGABYTE GeForce RTX 3060" "https://www.newegg.ca/gigabyte-geforce-rtx-3060-gv-n3060eagle-12gd/p/N82E16814932399" '"Instock":true'
-	scan "GIGABYTE GeForce RTX 3060 EAGLE OC Edition" "https://www.canadacomputers.com/product_info.php?cPath=43_557_559&item_id=189626" 'itemprop="availability" content="InStock"'
-	scan "GIGABYTE GeForce RTX 3060 EAGLE OC Edition" "https://www.memoryexpress.com/Products/MX00116063" "<header>Availability:" "-li" "2" "Out of Stock"
-	scan "GIGABYTE GeForce RTX 3060 Ti" "https://www.newegg.ca/gigabyte-geforce-rtx-3060-ti-gv-n306teagle-8gd/p/N82E16814932379" '"Instock":true'
-	scan "GIGABYTE GeForce RTX 3060 Ti EAGLE" "https://www.memoryexpress.com/Products/MX00114927" "<header>Availability:" "-li" "2" "Out of Stock"
-	scan "GIGABYTE GeForce RTX 3060 Ti EAGLE OC Edition" "https://www.memoryexpress.com/Products/MX00114926" "<header>Availability:" "-li" "2" "Out of Stock"
-	scan "ZOTAC GAMING GeForce RTX 3060" "https://www.newegg.ca/zotac-geforce-rtx-3060-zt-a30600e-10m/p/N82E16814500509" '"Instock":true'
-	scan "ZOTAC GAMING GeForce RTX 3060" "https://www.memoryexpress.com/Products/MX00116162" "<header>Availability:" "-li" "2" "Out of Stock"
-	scan "ZOTAC GAMING GeForce RTX 3060 OC" "https://www.memoryexpress.com/Products/MX00116159" "<header>Availability:" "-li" "2" "Out of Stock"
-	scan "ZOTAC GAMING GeForce RTX 3070" "https://www.newegg.ca/zotac-geforce-rtx-3070-zt-a30700h-10p/p/N82E16814500505" '"Instock":true'
 	#scan "test1" "https://www.newegg.ca/seagate-ironwolf-st6000vn0033-6tb/p/N82E16822172057" '"Instock":true'
 	#scan "test2" "https://www.canadacomputers.com/product_info.php?cPath=710_1925_1912_1911&item_id=187347" 'itemprop="availability" content="InStock"'
 	#scan "test3" "https://www.memoryexpress.com/Products/MX00115275" "<header>Availability:" "-li" "2" "Out of Stock"
@@ -135,5 +153,5 @@ do
 	else
 		print "notice" "check completed - "$(printf %.2f $(echo "${delay}/60" | bc -l))" minutes until the next one" #Prints the calculation (of minutes) with rounding to two decimal places
 	fi
-	sleep ${delay} #Yeah yeah I know that the scans take time, but exact precision isn't neccesary
+	sleep ${delay}
 done
