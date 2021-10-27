@@ -84,6 +84,17 @@ print()
 			then
 				open "$3" #This opens the product's URL in the user's default browser, if they hit the 'OK' button
 			fi #Presume that the OS is linux
+		elif [ "$(uname)" == "Linux" ] # If the os is Linux
+		then
+			printf "${BLU}[${GRN}\xE2\x9C\x94${BLU}] ${GRN}$2 is in stock\n"
+			zenity --question \
+			--title "$2 is in stock" \
+			--text "Do you want to open site web ?"	
+			if [ $? = 0 ]
+			then
+				echo "Open site web..."
+				sensible-browser "$3" #This opens the product's URL in the user's default browser, if they hit the 'OK' button
+			fi
 		else
 			echo "stub"
 		fi
