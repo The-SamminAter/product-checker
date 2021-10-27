@@ -75,28 +75,24 @@ print()
 	#$3: URL to open (if chosen)
 	if [ "$1" == "success" ]
 	then
+		printf "${BLU}[${GRN}\xE2\x9C\x94${BLU}] ${GRN}$2 is in stock\n"
 		tput bel #I believe this works on all OSes
 		if [ "$(uname)" == "Darwin" ] #This is done presuming that we have automation permission (if necessary)
 		then
-			printf "${BLU}[${GRN}\xE2\x9C\x94${BLU}] ${GRN}$2 is in stock\n"
 			shouldOpenURL=$(osascript -e 'tell app "System Events" to display dialog "'"$2 is in stock! Click OK to view it."'" with title "Product check"' 2>&1)
 			if [ "${shouldOpenURL}" == "button returned:OK" ]
 			then
 				open "$3" #This opens the product's URL in the user's default browser, if they hit the 'OK' button
-			fi #Presume that the OS is linux
-		elif [ "$(uname)" == "Linux" ] # If the os is Linux
-		then
-			printf "${BLU}[${GRN}\xE2\x9C\x94${BLU}] ${GRN}$2 is in stock\n"
+			fi
+		else #Presume that the OS is linux
 			zenity --question \
-			--title "$2 is in stock" \
-			--text "Do you want to open site web ?"	
+			--title "Product check" \
+			--text "$2 is in stock! Would you like to view it?"	
 			if [ $? = 0 ]
 			then
 				echo "Open site web..."
-				sensible-browser "$3" #This opens the product's URL in the user's default browser, if they hit the 'OK' button
+				sensible-browser "$3" #This opens the product's URL in the user's default browser, if they hit the 'Yes' button
 			fi
-		else
-			echo "stub"
 		fi
 	elif [ "$1" == "failure" ]
 	then
@@ -121,27 +117,27 @@ then
 			automationTest=$(osascript -e 'tell app "System Events" to display dialog' 2>&1 | awk {'print $NF'})
 			if [ "${automationTest}" == "(-1743)" ]
 			then
-				echo "we no good: ${automationTest}"
 				print "notice" "Automation permission is required to show alerts"
 				print "notice" "Please grant Terminal the permissions in 'System Preferences'->'Security & Privacy'->'Privacy'->'Automation'"
 			elif [ "${automationTest}" == "(-1700)" ]
 			then
-				echo "we good: ${automationTest}"
+				;;
 			else
-				echo "unknown error message: ${automationTest}"
+				print "notice" "Unknown error message: ${automationTest}"
 			fi
-			
 			#Getting the focused window so we can return to it immediately (need to check if it requires perms):
 			lastWindow=$(osascript -e 'tell application "System Events" to get name of application processes whose frontmost is true and visible is true')
 			echo "lastWindow: ${lastWindow}"
 			osascript -e "tell application \"${lastWindow}\" to activate"
-			
-			;;
 		*)
 			;;
 	esac
+else #Presume that the OS is Linux
+	if ! command -v zenity &> /dev/null #Source: http://stackoverflow.com/questions/592620/
+	then
+		print "notice" "Zenity doesn't appear to be installed. Please install Zenity to use this script"
+	fi
 fi
-#TODO: add linux alert support
 
 
 #URL checking:
@@ -152,6 +148,7 @@ do
 	#scan "test1" "https://www.newegg.ca/seagate-ironwolf-st6000vn0033-6tb/p/N82E16822172057" '"Instock":true'
 	#scan "test2" "https://www.canadacomputers.com/product_info.php?cPath=710_1925_1912_1911&item_id=187347" 'itemprop="availability" content="InStock"'
 	#scan "test3" "https://www.memoryexpress.com/Products/MX00115275" "<header>Availability:" "-li" "2" "Out of Stock"
+	#scan "test4" "https://orders.maximumsettings.com/" "Hardware capacity has been reached. Awaiting new gaming servers." "-i"
 	if [ ${delay} == 1 ]
 	then
 		print "notice" "check completed - 1 second until the next one"
