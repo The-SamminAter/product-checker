@@ -145,7 +145,7 @@ do
 	print "notice" "check started"
 	#scan "test1" "https://www.newegg.ca/seagate-ironwolf-st6000vn0033-6tb/p/N82E16822172057" '"Instock":true'
 	#scan "test2" "https://www.canadacomputers.com/product_info.php?cPath=710_1925_1912_1911&item_id=187347" 'itemprop="availability" content="InStock"'
-	#scan "test3" "https://www.memoryexpress.com/Products/MX00115275" "<header>Availability:" "-li" "2" "Out of Stock"
+	#scan "test3" "https://www.memoryexpress.com/Products/MX00115935" "<header>Availability:" "-li" "2" "Out of Stock"
 	#scan "test4" "https://orders.maximumsettings.com/" "Hardware capacity has been reached. Awaiting new gaming servers." "-i"
 	if [ ${delay} == 1 ]
 	then
