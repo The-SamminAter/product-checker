@@ -90,7 +90,6 @@ print()
 			--text "$2 is in stock! Would you like to view it?"	
 			if [ $? = 0 ]
 			then
-				echo "Open site web..."
 				sensible-browser "$3" #This opens the product's URL in the user's default browser, if they hit the 'Yes' button
 			fi
 		fi
