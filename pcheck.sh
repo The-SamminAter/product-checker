@@ -121,19 +121,16 @@ then
 				print "notice" "Please grant Terminal the permissions in 'System Preferences'->'Security & Privacy'->'Privacy'->'Automation'"
 			elif [ "${automationTest}" == "(-1700)" ]
 			then
-				;;
+				: #This is the desired result
 			else
 				print "notice" "Unknown error message: ${automationTest}"
 			fi
 			#Getting the focused window so we can return to it immediately (need to check if it requires perms):
 			lastWindow=$(osascript -e 'tell application "System Events" to get name of application processes whose frontmost is true and visible is true')
-			echo "lastWindow: ${lastWindow}"
 			osascript -e "tell application \"${lastWindow}\" to activate"
-		*)
-			;;
 	esac
 else #Presume that the OS is Linux
-	if ! command -v zenity &> /dev/null #Source: http://stackoverflow.com/questions/592620/
+	if [[ -z "$(command -v zenity)" ]] #Source: http://stackoverflow.com/questions/592620/
 	then
 		print "notice" "Zenity doesn't appear to be installed. Please install Zenity to use this script"
 	fi
