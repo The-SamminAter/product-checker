@@ -85,12 +85,15 @@ print()
 				open "$3" #This opens the product's URL in the user's default browser, if they hit the 'OK' button
 			fi
 		else #Presume that the OS is linux
-			zenity --question \
-			--title "Product check" \
-			--text "$2 is in stock! Would you like to view it?"	
-			if [ $? = 0 ]
+			zenity --question --title "Product check" --text "$2 is in stock! Would you like to view it?"	
+			if [ $? = 0 ] #This opens the product's URL in the user's default browser, if they hit the 'Yes' button
 			then
-				sensible-browser "$3" #This opens the product's URL in the user's default browser, if they hit the 'Yes' button
+				if [[ -z "$(which sensible-browser)" ]]
+				then
+					xdg-open "$3"
+				else
+					sensible-browser "$3" 
+				fi
 			fi
 		fi
 	elif [ "$1" == "failure" ]
@@ -129,7 +132,7 @@ then
 			osascript -e "tell application \"${lastWindow}\" to activate"
 	esac
 else #Presume that the OS is Linux
-	if [[ -z "$(command -v zenity)" ]] #Source: http://stackoverflow.com/questions/592620/
+	if [[ -z "$(which zenity)" ]]
 	then
 		print "notice" "Zenity doesn't appear to be installed. Please install Zenity to use this script"
 	fi
