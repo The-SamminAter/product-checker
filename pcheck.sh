@@ -123,13 +123,12 @@ then
 				print "notice" "Please grant Terminal the permissions in 'System Preferences'->'Security & Privacy'->'Privacy'->'Automation'"
 			elif [ "${automationTest}" == "(-1700)" ]
 			then
-				: #This is the desired result
+				#Getting the focused window so we can return to it immediately (need to check if it requires perms):
+				lastWindow=$(osascript -e 'tell application "System Events" to get name of application processes whose frontmost is true and visible is true')
+				osascript -e "tell application \"${lastWindow}\" to activate"
 			else
 				print "notice" "Unknown error message: ${automationTest}"
 			fi
-			#Getting the focused window so we can return to it immediately (need to check if it requires perms):
-			lastWindow=$(osascript -e 'tell application "System Events" to get name of application processes whose frontmost is true and visible is true')
-			osascript -e "tell application \"${lastWindow}\" to activate"
 	esac
 else #Presume that the OS is Linux
 	if [[ -z "$(which zenity)" ]]
