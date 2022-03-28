@@ -88,11 +88,11 @@ print()
 			zenity --question --title "Product check" --text "$2 is in stock! Would you like to view it?"	
 			if [ $? = 0 ] #This opens the product's URL in the user's default browser, if they hit the 'Yes' button
 			then
-				if [[ -z "$(which sensible-browser)" ]]
+				if [[ -z "$(which xdg-open)" ]]
 				then
-					xdg-open "$3"
+					sensible-browser "$3"
 				else
-					sensible-browser "$3" 
+					xdg-open "$3"
 				fi
 			fi
 		fi
@@ -150,7 +150,7 @@ do
 	if [ ${delay} == 1 ]
 	then
 		print "notice" "check completed - 1 second until the next one"
-	elif [[ ${delay} -lt 60 ]]
+	elif [[ ${delay} -lt 120 ]]
 	then
 		print "notice" "check completed - ${delay} seconds until the next one"
 	elif [ ${delay} == 60 ]
